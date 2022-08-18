@@ -2,6 +2,9 @@ from django.db import models
 
 
 # Create your models here.
+from django.template.defaultfilters import slugify
+
+
 class City(models.Model):
     name = models.CharField(max_length=50, verbose_name='Name of the location')
     slug = models.CharField(max_length=50, blank=True, unique=True)
@@ -13,9 +16,9 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug =
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 class Language(models.Model):
@@ -28,6 +31,10 @@ class Language(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 class Vacancies(models.Model):
@@ -45,3 +52,6 @@ class Vacancies(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
