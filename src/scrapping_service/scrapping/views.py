@@ -6,4 +6,4 @@ import datetime
 def home_view(request):
     query_set = Vacancies.objects.all()
     date = datetime.datetime.now().date()
-    return render(request, 'home.html', {'object_list' : query_set, 'date': date})
+    return render(request, 'scrapping/home.html', {'object_list' : query_set, 'date': date})
