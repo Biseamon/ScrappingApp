@@ -1,9 +1,35 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render
+
+from .forms import FindForm
 from .models import Vacancies
 import datetime
 
 # Create your views here.
 def home_view(request):
-    query_set = Vacancies.objects.all()
-    date = datetime.datetime.now().date()
-    return render(request, 'scrapping/home.html', {'object_list' : query_set, 'date': date})
+    # print(request.GET)
+    form = FindForm()
+
+    return render(request, 'scrapping/home.html', {'form': form})
+
+
+def list_view(request):
+    # print(request.GET)
+    form = FindForm()
+    city = request.GET.get('city')
+    language = request.GET.get('language')
+    context = {'city': city, 'language': language, 'form': form}
+    if city or language:
+        _filter = {}
+        if city:
+            _filter['city__slug'] = city
+        if language:
+            _filter['language__slug'] = language
+
+        qs = Vacancies.objects.filter(**_filter).select_related('city', 'language')
+        paginator = Paginator(qs, 10)  # Show 10 contacts per page.
+
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['object_list'] = page_obj
+    return render(request, 'scrapping/list.html', context)
